@@ -1,0 +1,12 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  ts:
+    context: ts
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  go:
+    context: go
