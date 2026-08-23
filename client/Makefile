@@ -3,9 +3,12 @@
 FILES = src/main.c
 CFLAGS = -lcurl -Isrc
 
-.PHONY: all clean
+.PHONY: all clean notimplemented
 
-all: build/client
+all: notimplemented
+
+notimplemented:
+	echo not implemented :p
 
 build:
 	mkdir -p build
