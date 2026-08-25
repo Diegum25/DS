@@ -1,4 +1,4 @@
-module github.com/Diegum25/yabadabadoo
+module github.com/Diegum25/DS
 
 go 1.26.6
 

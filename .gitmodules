@@ -1,3 +1,6 @@
 [submodule "client/libwebsockets"]
 	path = client/libwebsockets
 	url = https://libwebsockets.org/repo/libwebsockets
+[submodule "client/cglm"]
+	path = client/cglm
+	url = https://github.com/recp/cglm.git

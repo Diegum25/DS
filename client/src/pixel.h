@@ -3,20 +3,32 @@
 
 #include <sys/types.h>
 
-typedef u_int32_t Pixel;
+typedef u_int32_t pixel_t;
 
-void DS_StripA(Pixel*);
+typedef struct{
+    u_int8_t r;
+    u_int8_t g;
+    u_int8_t b;
+    u_int8_t a;
+}pixel_s;
 
-void DS_SetA(Pixel*,u_int8_t);
-void DS_SetR(Pixel*,u_int8_t);
-void DS_SetG(Pixel*,u_int8_t);
-void DS_SetB(Pixel*,u_int8_t);
+typedef union{
+    pixel_t pixel_t;
+    pixel_s pixel_s;
+}Pixel;
 
-void DS_SetRGBA(Pixel*, u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t a);
+void DS_StripA(pixel_t*);
 
-u_int8_t DS_GetA(Pixel*);
-u_int8_t DS_GetR(Pixel*);
-u_int8_t DS_GetG(Pixel*);
-u_int8_t DS_GetB(Pixel*);
+void DS_SetA(pixel_t*,u_int8_t);
+void DS_SetR(pixel_t*,u_int8_t);
+void DS_SetG(pixel_t*,u_int8_t);
+void DS_SetB(pixel_t*,u_int8_t);
+
+void DS_SetRGBA(pixel_t*, u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t a);
+
+u_int8_t DS_GetA(pixel_t*);
+u_int8_t DS_GetR(pixel_t*);
+u_int8_t DS_GetG(pixel_t*);
+u_int8_t DS_GetB(pixel_t*);
 
 #endif
