@@ -1,54 +1,7 @@
 #include "pixel.h"
 #include <sys/types.h>
 
-void DS_StripA(pixel_t* pixel){
-    *pixel = *pixel | 0xFF000000;
-};
-
-void DS_SetR(pixel_t* pixel, u_int8_t value){
-    u_int32_t shifted = value; // no shift
-    u_int32_t zeros = *pixel & 0xFFFFFF00;
-    *pixel = zeros | shifted;
-};
-
-void DS_SetG(pixel_t* pixel, u_int8_t value){
-    u_int32_t shifted = ((u_int32_t)value) << 8;
-    u_int32_t zeros = *pixel & 0xFFFF00FF;
-    *pixel = zeros | shifted;
-};
-
-void DS_SetB(pixel_t* pixel, u_int8_t value){
-    u_int32_t shifted = ((u_int32_t)value) << 8*2;
-    u_int32_t zeros = *pixel & 0xFF00FFFF;
-    *pixel = zeros | shifted;
-};
-
-void DS_SetA(pixel_t* pixel, u_int8_t value){
-    u_int32_t shifted = ((u_int32_t)value) << 8*3;
-    u_int32_t zeros = *pixel & 0x00FFFFFF;
-    *pixel = zeros | shifted;
-};
-
-void DS_SetRGBA(pixel_t* pixel, u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t a){
-    u_int32_t r_shifted = r;
-    u_int32_t g_shifted = ((u_int32_t)g) << 8;
-    u_int32_t b_shifted = ((u_int32_t)b) << 8*2;
-    u_int32_t a_shifted = ((u_int32_t)a) << 8*3;
-    *pixel = r_shifted | g_shifted | b_shifted | a_shifted;
-};
-
-u_int8_t DS_GetR(pixel_t* pixel){
-    return (*pixel & 0x000000FF);
-};
-
-u_int8_t DS_GetG(pixel_t* pixel){
-    return (*pixel & 0x0000FF00) >> 8;
-};
-
-u_int8_t DS_GetB(pixel_t* pixel){
-    return (*pixel & 0x00FF0000) >> 8*2;
-};
-
-u_int8_t DS_GetA(pixel_t* pixel){
-    return (*pixel & 0xFF000000) >> 8*3;
+Pixel DS_CreatePixel(u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t a){
+    Pixel ret = {.r = r, .g = g, .b = b, .a = a};
+    return ret;
 };
