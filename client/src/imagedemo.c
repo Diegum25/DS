@@ -24,6 +24,6 @@ int main(){
     pixels[2+(x*3)].g = 255;
     pixels[3+(x*2)].g = 255;
 
-    stbi_write_png("build/:).png",x,y,4,pixels,sizeof(pixel_t)*x);
+    stbi_write_png("build/:).png",x,y,4,pixels,sizeof(Pixel)*x);
     return 0;
 }
