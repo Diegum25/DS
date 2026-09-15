@@ -1,3 +1,4 @@
+#include "cglm/util.h"
 #include "hittable.h"
 #include "cglm/vec3.h"
 #include "ray.h"
@@ -12,7 +13,7 @@ bool SphereHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitReco
 
     float a = ray->destination[0] * ray->destination[0] + ray->destination[1] * ray->destination[1] + ray->destination[2] * ray->destination[2];
     float h = glm_vec3_dot(ray->destination, oc);
-    float c = (oc[0] * oc[0] + oc[1] * oc[1] + oc[2] * oc[2]) - sphere->radius * sphere->radius;
+    float c = glm_vec3_dot(oc, oc) - glm_pow2(sphere->radius); // this pow function is so fucking stupid
 
     float discrimination = h*h - a*c;
 
