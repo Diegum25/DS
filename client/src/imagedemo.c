@@ -2,6 +2,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "types.h"
 #include "pixel.h"
 #include <stdlib.h>
 

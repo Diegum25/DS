@@ -1,9 +1,11 @@
 #include "camera.h"
 #include "cglm/vec3.h"
+#include "hittable.h"
 #include "image.h"
-#include "pixel.h"
+#include "sphere.h"
 #include "ray.h"
 #include <sys/types.h>
+#include "rayutil.h"
 
 // https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
@@ -13,6 +15,11 @@ int main(){
     Image* image = DS_CreateImage(x,y);
 
     Camera cam = DS_CreateCamera(image);
+
+    vec3 pos = {0,0,-2};
+    Sphere* sphere = DS_CreateSphere(pos,0.5f);
+
+    Hittable* trolololo = (Hittable*)sphere;
 
     for(int i = 0; i < x;i++){
         for(int j = 0; j < y; j++){
@@ -30,11 +37,13 @@ int main(){
             glm_vec3_copy(cam.position, ray.origin);
             glm_vec3_copy(direction, ray.destination);
 
-            Pixel color = DS_RayColor(ray);
+            Pixel color = DS_RayColor(&ray,trolololo);
 
             image->image[i+(x*j)] = color;
         }
     }
+
+    DS_DestroySphere(sphere);
 
     DS_WriteImage(image, "build/rays.png");
 

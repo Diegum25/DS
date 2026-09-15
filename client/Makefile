@@ -1,7 +1,7 @@
 #!/usr/bin/make
 
 FILES = src/main.c
-CFLAGS = -lcurl -Isrc
+CFLAGS = -lcurl -lm -Icglm/include
 
 .PHONY: all clean notimplemented
 

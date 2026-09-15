@@ -6,7 +6,7 @@ Camera DS_CreateCamera(Image* image){
     Camera cam = {0};
     cam.focalLenght = 1.0f;
     cam.viewport.horizontal[0] = 1.0f;
-    cam.viewport.vertical[1] = -1.0f;
+    cam.viewport.vertical[1] = -1.0f; // this should be calculated with aspect ratio
     glm_vec3_divs(cam.viewport.horizontal, image->width, cam.viewport.horizontalDelta);
     glm_vec3_divs(cam.viewport.vertical, image->height, cam.viewport.verticalDelta);
 
