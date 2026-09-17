@@ -1,6 +1,6 @@
 # DS
 
-Distributed multithreaded raytraced (hopefully) software renderer.
+Distributed (hopefully) multithreaded raytraced software renderer.
 
 ## Building requirements
 
