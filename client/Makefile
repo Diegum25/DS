@@ -1,11 +1,14 @@
 #!/usr/bin/make
 
 FILES = src/main.c
-CFLAGS = -lcurl -Isrc
+CFLAGS = -lcurl -lm -Icglm/include
 
-.PHONY: all clean
+.PHONY: all clean notimplemented
 
-all: build/client
+all: notimplemented
+
+notimplemented:
+	echo not implemented :p
 
 build:
 	mkdir -p build

@@ -1,0 +1,3 @@
+[submodule "client/cglm"]
+	path = client/cglm
+	url = https://github.com/recp/cglm.git

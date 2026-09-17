@@ -1,10 +1,16 @@
-# MYEGA GRAND RENDERER 7 idk i ran out of names
+# DS
 
-Distributed multithreaded raytraced (hopefully) software renderer.
+Distributed (hopefully) multithreaded raytraced software renderer.
 
 ## Building requirements
-### Tools
-* GNU make and GCC
 
-### Libraries linked
-* curl
+### Client
+#### Tools
+* GNU make, CMake, GCC
+
+#### Dependecies
+* libcurl
+* libSDL3
+
+### Server
+* Go
