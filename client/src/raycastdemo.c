@@ -4,7 +4,6 @@
 #include "image.h"
 #include "sphere.h"
 #include "ray.h"
-#include <sys/types.h>
 #include "rayutil.h"
 
 // https://raytracing.github.io/books/RayTracingInOneWeekend.html
@@ -47,7 +46,7 @@ int main(){
 
     DS_WriteImage(image, "build/rays.png");
 
-    DS_DeleteImage(image);
+    DS_DestroyImage(image);
 
     return 0;
 };

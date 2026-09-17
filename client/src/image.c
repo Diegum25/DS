@@ -8,7 +8,7 @@
 
 #include "stb_image_write.h"
 
-Image* DS_CreateImage(uint16_t width, uint16_t height){
+Image* DS_CreateImage(Uint16 width, Uint16 height){
     Image* image = malloc(sizeof(Image));
     image->width = width;
     image->height = height;
@@ -16,7 +16,7 @@ Image* DS_CreateImage(uint16_t width, uint16_t height){
     return image;
 };
 
-void DS_DeleteImage(Image* image){
+void DS_DestroyImage(Image* image){
     free(image->image);
     free(image);
 };

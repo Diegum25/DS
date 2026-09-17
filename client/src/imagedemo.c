@@ -25,5 +25,7 @@ int main(){
     pixels[3+(x*2)].g = 255;
 
     stbi_write_png("build/:).png",x,y,4,pixels,sizeof(Pixel)*x);
+
+    free(pixels);
     return 0;
 }

@@ -1,17 +1,17 @@
 #ifndef DS_UTIL_H
 #define DS_UTIL_H
 
-#include <sys/types.h>
+#include <SDL3/SDL_stdinc.h>
 
-typedef u_int32_t pixel_t;
+typedef Uint32 pixel_t;
 
 typedef union{
     pixel_t pixel_t;
     struct{
-        u_int8_t r,g,b,a;
+        Uint8 r,g,b,a;
     };
 }Pixel;
 
-Pixel DS_CreatePixel(u_int8_t r, u_int8_t g, u_int8_t b, u_int8_t a);
+Pixel DS_CreatePixel(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 #endif

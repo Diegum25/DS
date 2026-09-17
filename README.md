@@ -10,6 +10,7 @@ Distributed multithreaded raytraced (hopefully) software renderer.
 
 #### Dependecies
 * libcurl
+* libSDL3
 
 ### Server
 * Go
