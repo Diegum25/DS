@@ -1,16 +1,20 @@
 # DS
 
-Distributed (hopefully) multithreaded raytraced software renderer.
+Distributed multithreaded raytraced software renderer.
 
-## Building requirements
+## Building
 
 ### Client
+
+Run `make all` inside the `client/` directory.
+
 #### Tools
-* GNU make, CMake, GCC
+* GNU make, GCC
 
 #### Dependecies
 * libcurl
 * libSDL3
 
 ### Server
-* Go
+
+Use `go run` with the `server/` directory.
