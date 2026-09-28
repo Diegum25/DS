@@ -3,31 +3,28 @@
 FILES = src/main.c \
 		src/info.c
 
-CFLAGS = -lcurl -lm -lSDL3 -Wl,-rpath,'$$ORIGIN' -LcJSON -lcjson -Icglm/include -IcJSON -I../shared
+CFLAGS = -lcurl -lm -lSDL3 -Icglm/include -IcJSON -I../shared
+
+BUILD = gcc $(FINALFLAGS) $(CFLAGS) $(FILES) cJSON/libcjson.a
 
 FINALFLAGS = -O3 -s
 DEBUGFLAGS = -ggdb
 
-.PHONY: all cJSON clean cJSON/libcjson.so.1
+.PHONY: all cJSON clean
 
 all: build/client-final build/client-debug
 
 build:
 	mkdir -p build
 
-# how do i make this one not run all the time
-build/libcjson.so.1: cJSON/libcjson.so.1
-	cp cJSON/libcjson.so.1 build/libcjson.so.1
-
-# i would also like this to be static but i couldnt get it to link propperly
 cJSON:
-	$(MAKE) -C cJSON libcjson.so
+	$(MAKE) -C cJSON libcjson.a
 
-build/client-final: $(FILES) cJSON | build build/libcjson.so.1
-	gcc $(FINALFLAGS) $(CFLAGS) $(FILES) -o$@
+build/client-final: $(FILES) cJSON | build
+	$(BUILD) -o$@
 
-build/client-debug: $(FILES) cJSON | build build/libcjson.so.1
-	gcc $(DEBUGFLAGS) $(CFLAGS) $(FILES) -o$@
+build/client-debug: $(FILES) cJSON | build
+	$(BUILD) -o$@
 
 clean:
 	rm build/client*
