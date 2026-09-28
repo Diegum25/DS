@@ -5,8 +5,6 @@ FILES = src/main.c \
 
 CFLAGS = -lcurl -lm -lSDL3 -Icglm/include -IcJSON -I../shared
 
-BUILD = gcc $(FINALFLAGS) $(CFLAGS) $(FILES) cJSON/libcjson.a
-
 FINALFLAGS = -O3 -s
 DEBUGFLAGS = -ggdb
 
@@ -21,10 +19,10 @@ cJSON:
 	$(MAKE) -C cJSON libcjson.a
 
 build/client-final: $(FILES) cJSON | build
-	$(BUILD) -o$@
+	gcc $(FINALFLAGS) $(CFLAGS) $(FILES) cJSON/libcjson.a -o$@
 
 build/client-debug: $(FILES) cJSON | build
-	$(BUILD) -o$@
+	gcc $(DEBUGFLAGS) $(CFLAGS) $(FILES) cJSON/libcjson.a -o$@
 
 clean:
 	rm build/client*
