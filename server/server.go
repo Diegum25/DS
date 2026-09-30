@@ -20,44 +20,72 @@ import (
 )
 
 type Client struct {
-	UUID   uuid.UUID
-	IP     string
-	Health int64
+	UUID          uuid.UUID
+	IP            string
+	Health        int64
+	toBeKeptAlive bool
 }
 
-const (
-	timeOutTime time.Duration = time.Second * 5
-)
-
-var serverState C.ServerState = C.ServerWait
-
-var connectionsMutex sync.Mutex
-var connections = make(map[uuid.UUID]Client)
+var server = struct {
+	state            C.ServerState
+	timeOutTime      time.Duration
+	connections      map[uuid.UUID]Client
+	connectionsMutex sync.Mutex
+}{state: C.ServerWait, timeOutTime: time.Second * 10, connections: make(map[uuid.UUID]Client)}
 
 func serverStatus(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "%v\n", serverState)
+	fmt.Fprintf(w, "%v\n", server.state)
 }
 
 func conncet(w http.ResponseWriter, r *http.Request) {
 	new := uuid.New()
-	client := Client{UUID: new, IP: r.RemoteAddr, Health: time.Now().Unix()}
+	client := Client{UUID: new, IP: r.RemoteAddr, Health: time.Now().Unix(), toBeKeptAlive: true}
 
-	connectionsMutex.Lock()
-	defer connectionsMutex.Unlock()
-	connections[new] = client
+	server.connectionsMutex.Lock()
+	defer server.connectionsMutex.Unlock()
+	server.connections[new] = client
 
 	response := struct {
 		Client      Client
 		ServerState C.ServerState
-	}{Client: client, ServerState: serverState}
+	}{Client: client, ServerState: server.state}
 
 	son, err := json.MarshalIndent(response, "", "	")
 	if err != nil {
 		log.Fatalf("%v\n", err)
 	}
 
-	fmt.Fprintf(w, "%s\n", son)
+	go func(headerUUID uuid.UUID) {
+		for {
+			time.Sleep(server.timeOutTime)
+			if func() bool {
+				server.connectionsMutex.Lock()
+				defer server.connectionsMutex.Unlock()
 
+				client := server.connections[headerUUID]
+
+				if client.Health == 0 {
+					return true
+				}
+
+				if !client.toBeKeptAlive {
+					fmt.Printf("Time passed for %v\n", client)
+					delete(server.connections, client.UUID)
+					return true
+				}
+
+				client.toBeKeptAlive = false
+
+				server.connections[headerUUID] = client
+
+				return false
+			}() {
+				break
+			}
+		}
+	}(client.UUID)
+
+	fmt.Fprintf(w, "%s\n", son)
 }
 
 func heartbeat(w http.ResponseWriter, r *http.Request) {
@@ -75,22 +103,25 @@ func heartbeat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	connectionsMutex.Lock()
-	defer connectionsMutex.Unlock()
-	client := connections[headerUUID]
+	server.connectionsMutex.Lock()
+	defer server.connectionsMutex.Unlock()
+	client := server.connections[headerUUID]
 
-	if client.UUID == uuid.Nil() {
+	if client.Health == 0 {
 		http.Error(w, "Bad UUID", http.StatusUnauthorized)
 		return
 	}
 
 	client.Health = time.Now().Unix()
-	connections[headerUUID] = client
+
+	client.toBeKeptAlive = true
+
+	server.connections[headerUUID] = client
 
 	response := struct {
 		Client      Client
 		ServerState C.ServerState
-	}{Client: client, ServerState: serverState}
+	}{Client: client, ServerState: server.state}
 
 	son, err := json.MarshalIndent(response, "", "	")
 	if err != nil {
@@ -101,37 +132,40 @@ func heartbeat(w http.ResponseWriter, r *http.Request) {
 }
 
 func disconnect(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not implemented :P", http.StatusNotImplemented)
-}
+	headerUUIDString := r.Header["Uuid"]
 
-func feetusDeletus() {
-	for {
-		func() {
-			connectionsMutex.Lock()
-			defer connectionsMutex.Unlock()
-
-			u := time.Now().Add(-timeOutTime).Unix()
-
-			for UUID, client := range connections {
-				if client.Health < u {
-					fmt.Printf("time has passed for %v\n", client)
-					delete(connections, UUID)
-				}
-			}
-
-			//fmt.Printf("%v\n", connections)
-		}()
-		time.Sleep(time.Duration(time.Second))
+	if headerUUIDString == nil {
+		http.Error(w, "No UUID", http.StatusBadRequest)
+		return
 	}
-}
 
-func main() {
-	http.HandleFunc("GET /{$}", serverStatus)
-	http.HandleFunc("GET /connect", conncet)
-	http.HandleFunc("POST /heartbeat", heartbeat)
-	http.HandleFunc("POST /disconnect", disconnect)
+	headerUUID, err := uuid.Parse(headerUUIDString[0])
 
-	go feetusDeletus()
+	if err != nil {
+		http.Error(w, "Malformed UUID", http.StatusNotAcceptable)
+		return
+	}
 
-	log.Fatal(http.ListenAndServe(":57165", nil))
+	server.connectionsMutex.Lock()
+	defer server.connectionsMutex.Unlock()
+
+	client := server.connections[headerUUID]
+
+	if client.Health == 0 {
+		http.Error(w, "Bad UUID", http.StatusUnauthorized)
+		return
+	}
+
+	delete(server.connections, headerUUID)
+
+	response := struct {
+		ServerState C.ServerState
+	}{ServerState: server.state}
+
+	son, err := json.MarshalIndent(response, "", "	")
+	if err != nil {
+		log.Fatalf("%v\n", err)
+	}
+
+	fmt.Fprintf(w, "%s\n", son)
 }
