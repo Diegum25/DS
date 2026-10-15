@@ -1,12 +1,17 @@
 #!/usr/bin/make
 
-FILES = src/main.c \
+UTILFILES = src/ray.c \
+		src/pixel.c \
+		src/sphere.c \
+		src/image.c \
+		src/camera.c \
 		src/info.c
 
-CFLAGS = -lcurl -lm -lSDL3 -Icglm/include -IcJSON -I../shared
+CFLAGS = -Wall -Icglm/include -IcJSON -I../shared
+LFLAGS = -lcurl -lm -lSDL3
 
-FINALFLAGS = -O3 -s
-DEBUGFLAGS = -ggdb
+FINALCFLAGS = -O3 -s $(CFLAGS)
+DEBUGCFLAGS = -ggdb $(CFLAGS)
 
 .PHONY: all cJSON clean
 
@@ -18,11 +23,14 @@ build:
 cJSON:
 	$(MAKE) -C cJSON libcjson.a
 
-build/client-final: $(FILES) cJSON | build
-	gcc $(FINALFLAGS) $(CFLAGS) $(FILES) cJSON/libcjson.a -o$@
+build/client-final: $(UTILFILES) cJSON | build
+	gcc $(FINALCFLAGS) $(UTILFILES) src/main.c cJSON/libcjson.a $(LFLAGS) -o$@
 
-build/client-debug: $(FILES) cJSON | build
-	gcc $(DEBUGFLAGS) $(CFLAGS) $(FILES) cJSON/libcjson.a -o$@
+build/client-debug: $(UTILFILES) cJSON | build
+	gcc $(DEBUGCFLAGS) $(UTILFILES) src/main.c cJSON/libcjson.a $(LFLAGS) -o$@
+
+build/rays: | build
+	gcc $(DEBUGCFLAGS) $(UTILFILES) src/balanceddemo.c $(LFLAGS) -o$@
 
 clean:
 	rm build/client*

@@ -6,7 +6,7 @@
 #include "pixel.h"
 #include "hittable.h"
 
-Ray DS_CreateRay(float *origin, float *destination){
+Ray DS_CreateRay(vec3 origin, vec3 destination){
     Ray ray = {0};
     glm_vec3_copy(origin, ray.origin);
     glm_vec3_copy(destination, ray.destination);
