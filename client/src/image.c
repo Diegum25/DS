@@ -2,10 +2,6 @@
 #include "pixel.h"
 #include <stdlib.h>
 
-#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
-    #define STB_IMAGE_WRITE_IMPLEMENTATION
-#endif
-
 #include "stb_image_write.h"
 
 Image* DS_CreateImage(Uint16 width, Uint16 height){

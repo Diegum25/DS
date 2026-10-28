@@ -1,3 +1,4 @@
+#include "cglm/types.h"
 #include "cglm/util.h"
 #include "hittable.h"
 #include "cglm/vec3.h"
@@ -30,8 +31,10 @@ bool SphereHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitReco
 
     hitRecord->t = root;
     DS_RayAt(ray, root, hitRecord->p);
-    glm_vec3_sub(hitRecord->p, sphere->origin, hitRecord->normal);
-    glm_vec3_divs(hitRecord->normal, sphere->radius, hitRecord->normal);
+    vec3 outNormal = {0};
+    glm_vec3_sub(hitRecord->p, sphere->origin, outNormal);
+    glm_vec3_divs(outNormal, sphere->radius, outNormal);
+    HitRecordFaceNormal(hitRecord, ray, outNormal);
 
     return true;
 };
