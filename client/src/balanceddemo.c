@@ -1,3 +1,4 @@
+#include "list.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
@@ -103,13 +104,30 @@ int main(){
     Camera cam = DS_CreateCamera(image);
 
     vec3 pos = {0,0,-2};
-    Sphere* sphere = DS_CreateSphere(pos,0.5f);
+    Sphere* sphere = DS_CreateSphere(pos, 0.5f);
 
-    Hittable* trolololo = (Hittable*)sphere;
+    vec3 pos2 = {0,-5.5f,-2};
+    Sphere* sphere2 = DS_CreateSphere(pos2, 5.0f);
+
+    HittableList* list = DS_CreateList();
+    
+    list->first = calloc(1, sizeof(HittableListRecord));
+
+    list->first->next = calloc(1, sizeof(HittableListRecord));
+
+    list->first->item = (Hittable*)sphere;
+
+    list->first->next->item = (Hittable*)sphere2;
+
+    Hittable* trolololo = (Hittable*)list;
 
     MultiThread(4, image, &cam, trolololo);
 
-    DS_WriteImage(image, "build/rays.png");
+    DS_WriteImage(image, "build/rays.png"); // <- wont say anything if there is no build dir lol.
+
+    free(list->first);
+
+    DS_DestroyList(list);
 
     DS_DestroySphere(sphere);
 

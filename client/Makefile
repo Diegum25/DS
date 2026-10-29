@@ -6,7 +6,8 @@ UTILFILES = src/ray.c \
 		src/image.c \
 		src/camera.c \
 		src/info.c \
-		src/hittable.c
+		src/hittable.c \
+		src/list.c
 
 CFLAGS = -Wall -Icglm/include -IcJSON -I../shared
 LFLAGS = -lcurl -lm -lSDL3
