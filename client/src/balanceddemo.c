@@ -111,13 +111,8 @@ int main(){
 
     HittableList* list = DS_CreateList();
     
-    list->first = calloc(1, sizeof(HittableListRecord));
-
-    list->first->next = calloc(1, sizeof(HittableListRecord));
-
-    list->first->item = (Hittable*)sphere;
-
-    list->first->next->item = (Hittable*)sphere2;
+    DS_ListAdd(list, (Hittable*)sphere);
+    DS_ListAdd(list, (Hittable*)sphere2);
 
     Hittable* trolololo = (Hittable*)list;
 
@@ -125,11 +120,10 @@ int main(){
 
     DS_WriteImage(image, "build/rays.png"); // <- wont say anything if there is no build dir lol.
 
-    free(list->first);
-
     DS_DestroyList(list);
 
     DS_DestroySphere(sphere);
+    DS_DestroySphere(sphere2);
 
     DS_DestroyImage(image);
 
