@@ -103,20 +103,27 @@ int main(){
 
     Camera cam = DS_CreateCamera(image);
 
-    vec3 pos = {0,0,-2};
-    Sphere* sphere = DS_CreateSphere(pos, 0.5f);
+    HittableList* list = DS_CreateList();
+
+    vec3 pos1 = {0,0,-2};
+    Sphere* sphere = DS_CreateSphere(pos1, 0.5f);
 
     vec3 pos2 = {0,-5.5f,-2};
     Sphere* sphere2 = DS_CreateSphere(pos2, 5.0f);
 
-    HittableList* list = DS_CreateList();
-    
     DS_ListAdd(list, (Hittable*)sphere);
     DS_ListAdd(list, (Hittable*)sphere2);
 
-    Hittable* trolololo = (Hittable*)list;
+    const int randomBalls = 10;
+    Sphere* bolas[randomBalls];
 
-    MultiThread(4, image, &cam, trolololo);
+    for (int i = 0; i < randomBalls; i++){
+        vec3 pos = {SDL_randf()*5 - 2.5f,SDL_randf()*5,-SDL_randf()*5};
+        bolas[i] = DS_CreateSphere(pos, SDL_randf());
+        DS_ListAdd(list, (Hittable *)bolas[i]);
+    };
+
+    MultiThread(4, image, &cam, (Hittable*)list);
 
     DS_WriteImage(image, "build/rays.png"); // <- wont say anything if there is no build dir lol.
 
@@ -124,6 +131,10 @@ int main(){
 
     DS_DestroySphere(sphere);
     DS_DestroySphere(sphere2);
+
+    for (int i = 0; i < randomBalls; i++){
+        DS_DestroySphere(bolas[i]);
+    };
 
     DS_DestroyImage(image);
 

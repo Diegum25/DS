@@ -1,5 +1,6 @@
 #include "list.h"
 #include "hittable.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 bool ListHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitRecord* hitRecord){
@@ -39,7 +40,7 @@ HittableList* DS_CreateList(){
 void DS_ListAdd(HittableList* this, Hittable* ptr){
     if(this->inUse >= ipow(2, this->size)){
         this->size++;
-        this->list = realloc(this->list, ipow(2, this->size));
+        this->list = realloc(this->list, sizeof(void*)*ipow(2, this->size));
     }
     this->list[this->inUse++] = ptr;
 };
