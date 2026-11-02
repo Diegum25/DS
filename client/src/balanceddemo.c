@@ -1,4 +1,5 @@
 #include "list.h"
+#include "ray.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
@@ -18,11 +19,11 @@
 SDL_Mutex* dataMutex;
 
 typedef struct{
-    Uint32 rayCount;
-    Ray* p_Rays;
-    Uint32 nextRay;
+    Ray** p_Rays;
+    Uint32 nextSet;
     Image* p_Image;
     Hittable* p_Hittable;
+    Uint16 samples;
 }BounceData;
 
 int Bounce(void * p_Data){
@@ -31,29 +32,47 @@ int Bounce(void * p_Data){
     while(true){
         SDL_LockMutex(dataMutex);
 
-        if(data->nextRay >= data->rayCount){
+        if(data->nextSet >= data->p_Image->height * data->p_Image->width){
             SDL_UnlockMutex(dataMutex);
             return 0;
         }
 
-        Uint32 myRay = data->nextRay++;
+        Uint32 mySet = data->nextSet++;
 
         SDL_UnlockMutex(dataMutex);
 
         // i dont believe this could cause a problem
 
-        Pixel color = DS_RayColor(&data->p_Rays[myRay],data->p_Hittable);
+        Uint32 r = 0, g = 0, b = 0; // averages
 
-        data->p_Image->image[myRay] = color;
+        for(int i = 0; i < data->samples; i++){
+            Pixel color = DS_RayColor(&data->p_Rays[mySet][i],data->p_Hittable);
+            r += color.r;
+            g += color.g;
+            b += color.b;
+        }
 
+        r = r / data->samples;
+        g = g / data->samples;
+        b = b / data->samples;
+
+        Pixel final = {.r = r, .g = g, .b = b, .a = 255};
+
+        data->p_Image->image[mySet] = final;
     }
 
     return 666;
 }
 
-void MultiThread(Uint16 threadCount, Image* p_Image, Camera* p_Camera, Hittable* p_Hittable){
-    Uint32 rayCount = p_Image->width*p_Image->height;
-    Ray* rays = calloc(rayCount, sizeof(Ray));
+void RandomizeRayABit(Ray* ray){
+    vec3 axis1 = {1,0,0};
+    vec3 axis2 = {0,1,0};
+    glm_vec3_rotate(ray->destination, (SDL_randf()*2 -1)/1024, axis1); // this looks alr8
+    glm_vec3_rotate(ray->destination, (SDL_randf()*2 -1)/1024, axis2);
+};
+
+void MultiThread(Uint16 threadCount, Uint16 samples, Image* p_Image, Camera* p_Camera, Hittable* p_Hittable){
+    Ray** imagePixelRays = calloc(p_Image->width*p_Image->height, sizeof(void*));
     for(int i = 0; i < p_Image->width;i++){
         for(int j = 0; j < p_Image->height; j++){
             vec3 horizontal = {0}; glm_vec3_scale(p_Camera->viewport.horizontalDelta, i, horizontal);
@@ -66,10 +85,15 @@ void MultiThread(Uint16 threadCount, Image* p_Image, Camera* p_Camera, Hittable*
             vec3 direction = {0};
             glm_vec3_sub(pixel, p_Camera->position, direction);
 
-            Ray ray = {0};
-            glm_vec3_copy(p_Camera->position, ray.origin);
-            glm_vec3_copy(direction, ray.destination);
-            rays[i+(j * p_Image->width)] = ray;
+            imagePixelRays[i+(j * p_Image->width)] = calloc(samples, sizeof(Ray));
+
+            for(int k = 0; k < samples; k++){
+                Ray ray = {0};
+                glm_vec3_copy(p_Camera->position, ray.origin);
+                glm_vec3_copy(direction, ray.destination);
+                RandomizeRayABit(&ray);
+                imagePixelRays[i+(j * p_Image->width)][k] = ray; // i have no idea why theyre arranged like that anymore lol
+            }
         }
     }
 
@@ -77,7 +101,7 @@ void MultiThread(Uint16 threadCount, Image* p_Image, Camera* p_Camera, Hittable*
 
     dataMutex = SDL_CreateMutex();
 
-    BounceData data = {.p_Hittable = p_Hittable, .p_Image = p_Image, .p_Rays = rays, .rayCount = rayCount, .nextRay = 0};
+    BounceData data = {.p_Hittable = p_Hittable, .p_Image = p_Image, .p_Rays = imagePixelRays, .nextSet = 0, .samples = samples};
 
     for(int i = 0; i < threadCount; i++){
         threads[i] = SDL_CreateThread(Bounce,"Thread",&data);
@@ -92,12 +116,17 @@ void MultiThread(Uint16 threadCount, Image* p_Image, Camera* p_Camera, Hittable*
     }
 
     free(threads);
-    free(rays);
+    for(int i = 0; i < p_Image->width*p_Image->height; i++){
+        free(imagePixelRays[i]);
+    }
+    free(imagePixelRays);
 }
 
 int main(){
 
     Uint16 x = 800, y = 800;
+
+    Uint16 samples = 16;
     
     Image* image = DS_CreateImage(x,y);
 
@@ -123,7 +152,7 @@ int main(){
         DS_ListAdd(list, (Hittable *)bolas[i]);
     };
 
-    MultiThread(4, image, &cam, (Hittable*)list);
+    MultiThread(4, samples, image, &cam, (Hittable*)list);
 
     DS_WriteImage(image, "build/rays.png"); // <- wont say anything if there is no build dir lol.
 
