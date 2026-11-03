@@ -1,6 +1,5 @@
 #include "list.h"
 #include "hittable.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 bool ListHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitRecord* hitRecord){
@@ -9,7 +8,7 @@ bool ListHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitRecord
     bool hitSomething = false;
     float closest = ray_tmax;
 
-    for(int i = 0; i < list->inUse; i++){
+    for(Uint32 i = 0; i < list->inUse; i++){
         Hittable* hittable = list->list[i];
         if (hittable->hit(hittable,ray,ray_tmin,closest,&temp)){
             hitSomething = true;
@@ -20,7 +19,7 @@ bool ListHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitRecord
     return hitSomething;
 }
 
-int ipow(int x, int y){
+Uint32 ipow(int x, int y){
     if(y == 0) return 1;
 
     int result = x;

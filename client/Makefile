@@ -9,7 +9,7 @@ UTILFILES = src/ray.c \
 		src/hittable.c \
 		src/list.c
 
-CFLAGS = -Wall -Icglm/include -IcJSON -I../shared
+CFLAGS = -Wall -Wextra -Icglm/include -IcJSON -I../shared
 LFLAGS = -lcurl -lm -lSDL3
 
 FINALCFLAGS = -O3 -s $(CFLAGS)

@@ -18,5 +18,5 @@ void DS_DestroyImage(Image* image){
 };
 
 void DS_WriteImage(Image* image, const char* filename){
-    stbi_write_png("build/rays.png",image->width,image->height,4,image->image,sizeof(Pixel)*image->width);
+    stbi_write_png(filename,image->width,image->height,4,image->image,sizeof(Pixel)*image->width);
 };

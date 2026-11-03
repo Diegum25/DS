@@ -39,9 +39,7 @@ int Bounce(void * p_Data){
 
         Uint32 mySet = data->nextSet++;
 
-        SDL_UnlockMutex(dataMutex);
-
-        // i dont believe this could cause a problem
+        SDL_UnlockMutex(dataMutex); // i dont believe this could cause a problem
 
         Uint32 r = 0, g = 0, b = 0; // averages
 
@@ -71,27 +69,30 @@ void RandomizeRayABit(Ray* ray){
     glm_vec3_rotate(ray->destination, (SDL_randf()*2 -1)/1024, axis2);
 };
 
+void SampleRandomThing(vec3 dest){
+    vec3 thing = {SDL_randf() - 0.5f, SDL_randf() - 0.5f, 0.0f};
+    glm_vec3_copy(thing, dest);
+};
+
 void MultiThread(Uint16 threadCount, Uint16 samples, Image* p_Image, Camera* p_Camera, Hittable* p_Hittable){
     Ray** imagePixelRays = calloc(p_Image->width*p_Image->height, sizeof(void*));
     for(int i = 0; i < p_Image->width;i++){
         for(int j = 0; j < p_Image->height; j++){
-            vec3 horizontal = {0}; glm_vec3_scale(p_Camera->viewport.horizontalDelta, i, horizontal);
-            vec3 vertical = {0}; glm_vec3_scale(p_Camera->viewport.verticalDelta, j, vertical);
-
-            vec3 pixel = {0};
-            glm_vec3_add(p_Camera->zero, horizontal, pixel);
-            glm_vec3_add(pixel, vertical, pixel);
-
-            vec3 direction = {0};
-            glm_vec3_sub(pixel, p_Camera->position, direction);
-
             imagePixelRays[i+(j * p_Image->width)] = calloc(samples, sizeof(Ray));
-
             for(int k = 0; k < samples; k++){
+                vec3 offset = {0}; SampleRandomThing(offset);
+                vec3 horizontal = {0}; glm_vec3_scale(p_Camera->viewport.horizontalDelta, i + offset[0], horizontal);
+                vec3 vertical = {0}; glm_vec3_scale(p_Camera->viewport.verticalDelta, j + offset[1], vertical);
+
+                vec3 pixel = {0};
+                glm_vec3_add(p_Camera->zero, horizontal, pixel);
+                glm_vec3_add(pixel, vertical, pixel);
+
+                vec3 direction = {0};
+                glm_vec3_sub(pixel, p_Camera->position, direction);
                 Ray ray = {0};
                 glm_vec3_copy(p_Camera->position, ray.origin);
                 glm_vec3_copy(direction, ray.destination);
-                RandomizeRayABit(&ray);
                 imagePixelRays[i+(j * p_Image->width)][k] = ray; // i have no idea why theyre arranged like that anymore lol
             }
         }
