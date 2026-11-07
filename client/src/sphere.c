@@ -1,3 +1,4 @@
+#include "cglm/types.h"
 #include "cglm/util.h"
 #include "hittable.h"
 #include "cglm/vec3.h"
@@ -5,7 +6,7 @@
 #include <stdlib.h>
 #include "sphere.h"
 
-bool SphereHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitRecord* hitRecord){
+bool SphereHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitData* data){
     Sphere* sphere = (Sphere*)this;
     // wtf
     vec3 oc;
@@ -28,10 +29,12 @@ bool SphereHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitReco
         if (root <= ray_tmin || ray_tmax <= root) return false;
     }
 
-    hitRecord->t = root;
-    DS_RayAt(ray, root, hitRecord->p);
-    glm_vec3_sub(hitRecord->p, sphere->origin, hitRecord->normal);
-    glm_vec3_divs(hitRecord->normal, sphere->radius, hitRecord->normal);
+    data->t = root;
+    DS_RayAt(ray, root, data->p);
+    vec3 outNormal = {0};
+    glm_vec3_sub(data->p, sphere->origin, outNormal);
+    glm_vec3_divs(outNormal, sphere->radius, outNormal);
+    HitDataFaceNormal(data, ray, outNormal);
 
     return true;
 };

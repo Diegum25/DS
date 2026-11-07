@@ -1,20 +1,38 @@
 #!/usr/bin/make
 
-FILES = src/main.c
-CFLAGS = -lcurl -lm -Icglm/include
+UTILFILES = src/ray.c \
+		src/pixel.c \
+		src/sphere.c \
+		src/image.c \
+		src/camera.c \
+		src/info.c \
+		src/hittable.c \
+		src/list.c
 
-.PHONY: all clean notimplemented
+CFLAGS = -Wall -Wextra -Icglm/include -IcJSON -I../shared
+LFLAGS = -lcurl -lm -lSDL3
 
-all: notimplemented
+FINALCFLAGS = -O3 -s $(CFLAGS)
+DEBUGCFLAGS = -g -ggdb $(CFLAGS)
 
-notimplemented:
-	echo not implemented :p
+.PHONY: all cJSON clean
+
+all: build/client-final build/client-debug
 
 build:
 	mkdir -p build
 
-build/client: $(FILES) | build
-	gcc $(CFLAGS) $(FILES) -o$@
+cJSON:
+	$(MAKE) -C cJSON libcjson.a
+
+build/client-final: $(UTILFILES) cJSON src/main.c | build
+	gcc $(FINALCFLAGS) $(UTILFILES) src/main.c cJSON/libcjson.a $(LFLAGS) -o$@
+
+build/client-debug: $(UTILFILES) cJSON src/main.c | build
+	gcc $(DEBUGCFLAGS) $(UTILFILES) src/main.c cJSON/libcjson.a $(LFLAGS) -o$@
+
+build/rays: $(UTILFILES) src/balanceddemo.c | build
+	gcc $(DEBUGCFLAGS) $(UTILFILES) src/balanceddemo.c $(LFLAGS) -o$@
 
 clean:
-	rm -rf build
+	echo not implemented :P

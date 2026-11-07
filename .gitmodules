@@ -1,3 +1,6 @@
 [submodule "client/cglm"]
 	path = client/cglm
 	url = https://github.com/recp/cglm.git
+[submodule "client/cJSON"]
+	path = client/cJSON
+	url = https://github.com/DaveGamble/cJSON.git

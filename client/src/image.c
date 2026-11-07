@@ -2,10 +2,6 @@
 #include "pixel.h"
 #include <stdlib.h>
 
-#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
-    #define STB_IMAGE_WRITE_IMPLEMENTATION
-#endif
-
 #include "stb_image_write.h"
 
 Image* DS_CreateImage(Uint16 width, Uint16 height){
@@ -22,5 +18,5 @@ void DS_DestroyImage(Image* image){
 };
 
 void DS_WriteImage(Image* image, const char* filename){
-    stbi_write_png("build/rays.png",image->width,image->height,4,image->image,sizeof(Pixel)*image->width);
+    stbi_write_png(filename,image->width,image->height,4,image->image,sizeof(Pixel)*image->width);
 };

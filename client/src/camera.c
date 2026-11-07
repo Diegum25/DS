@@ -6,11 +6,14 @@ Camera DS_CreateCamera(Image* image){
     Camera cam = {0};
     cam.focalLenght = 1.0f;
     cam.viewport.horizontal[0] = 1.0f;
-    cam.viewport.vertical[1] = -1.0f; // this should be calculated with aspect ratio
+
+    float ratio = (float)image->height / (float)image->width;
+
+    cam.viewport.vertical[1] = -ratio;
     glm_vec3_divs(cam.viewport.horizontal, image->width, cam.viewport.horizontalDelta);
     glm_vec3_divs(cam.viewport.vertical, image->height, cam.viewport.verticalDelta);
 
-    //viewport_upper_left = camera_center - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;}
+    //viewport_upper_left = camera_center - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;} <-- c++ shit
     vec3 focalVector = {0,0,cam.focalLenght};
     vec3 horizontalVecDivBy2 = {0};
     vec3 verticalVecDivBy2 = {0};
@@ -22,7 +25,7 @@ Camera DS_CreateCamera(Image* image){
     glm_vec3_sub(cam.viewportUL, horizontalVecDivBy2, cam.viewportUL);
     glm_vec3_sub(cam.viewportUL, verticalVecDivBy2, cam.viewportUL);
 
-    //pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+    //pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v); <-- c++ shit
     vec3 sum;
 
     glm_vec3_add(cam.viewport.horizontalDelta,cam.viewport.verticalDelta,sum);
