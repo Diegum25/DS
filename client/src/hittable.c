@@ -3,7 +3,7 @@
 #include "cglm/vec3.h"
 #include "ray.h"
 
-void HitRecordFaceNormal(HitRecord* hr, Ray* ray, vec3 outNormal){
+void HitDataFaceNormal(HitData* hr, Ray* ray, vec3 outNormal){
     float dot = glm_dot(ray->destination, outNormal);
     hr->frontFaced = dot < 0;
     if (hr->frontFaced){

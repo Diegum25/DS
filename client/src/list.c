@@ -2,9 +2,10 @@
 #include "hittable.h"
 #include <stdlib.h>
 
-bool ListHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitRecord* hitRecord){
+bool ListHit(Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitData* hitRecord){
     HittableList* list = (HittableList*)this;
-    HitRecord temp;
+
+    HitData temp;
     bool hitSomething = false;
     float closest = ray_tmax;
 

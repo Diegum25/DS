@@ -10,12 +10,12 @@ typedef struct {
     vec3 normal;
     float t;
     bool frontFaced;
-}HitRecord;
+}HitData;
 
 typedef struct Hittable{
-    bool (*hit)(struct Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitRecord* hitRecord);
+    bool (*hit)(struct Hittable* this, Ray* ray, float ray_tmin, float ray_tmax, HitData* hitRecord);
 }Hittable;
 
-void HitRecordFaceNormal(HitRecord* hr, Ray* ray, vec3 outNormal);
+void HitDataFaceNormal(HitData* hr, Ray* ray, vec3 outNormal);
 
 #endif

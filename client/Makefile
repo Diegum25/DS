@@ -13,7 +13,7 @@ CFLAGS = -Wall -Wextra -Icglm/include -IcJSON -I../shared
 LFLAGS = -lcurl -lm -lSDL3
 
 FINALCFLAGS = -O3 -s $(CFLAGS)
-DEBUGCFLAGS = -ggdb $(CFLAGS)
+DEBUGCFLAGS = -g -ggdb $(CFLAGS)
 
 .PHONY: all cJSON clean
 
@@ -34,5 +34,8 @@ build/client-debug: $(UTILFILES) cJSON src/main.c | build
 build/rays: $(UTILFILES) src/balanceddemo.c | build
 	gcc $(DEBUGCFLAGS) $(UTILFILES) src/balanceddemo.c $(LFLAGS) -o$@
 
+build/bounce: $(UTILFILES) src/bouncedemo.c | build
+	gcc $(DEBUGCFLAGS) $(UTILFILES) src/bouncedemo.c $(LFLAGS) -o$@
+
 clean:
-	rm build/client*
+	echo not implemented :P

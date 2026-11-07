@@ -24,10 +24,11 @@ typedef struct{
     Image* p_Image;
     Hittable* p_Hittable;
     Uint16 samples;
-}BounceData;
+    Uint8 bounces;
+}MultiData;
 
 int Bounce(void * p_Data){
-    BounceData* data = p_Data;
+    MultiData* data = p_Data;
 
     while(true){
         SDL_LockMutex(dataMutex);
@@ -44,7 +45,7 @@ int Bounce(void * p_Data){
         Uint32 r = 0, g = 0, b = 0; // averages
 
         for(int i = 0; i < data->samples; i++){
-            Pixel color = DS_RayColor(&data->p_Rays[mySet][i],data->p_Hittable);
+            Pixel color = DS_RayColor(&data->p_Rays[mySet][i],data->p_Hittable,data->bounces);
             r += color.r;
             g += color.g;
             b += color.b;
@@ -62,19 +63,13 @@ int Bounce(void * p_Data){
     return 666;
 }
 
-void RandomizeRayABit(Ray* ray){
-    vec3 axis1 = {1,0,0};
-    vec3 axis2 = {0,1,0};
-    glm_vec3_rotate(ray->destination, (SDL_randf()*2 -1)/1024, axis1); // this looks alr8
-    glm_vec3_rotate(ray->destination, (SDL_randf()*2 -1)/1024, axis2);
-};
-
 void SampleRandomThing(vec3 dest){
     vec3 thing = {SDL_randf() - 0.5f, SDL_randf() - 0.5f, 0.0f};
     glm_vec3_copy(thing, dest);
 };
 
-void MultiThread(Uint16 threadCount, Uint16 samples, Image* p_Image, Camera* p_Camera, Hittable* p_Hittable){
+void MultiThread(Uint16 threadCount, Uint16 samples, Uint8 bounces, Image* p_Image, Camera* p_Camera, Hittable* p_Hittable){
+    // this could be simpler and be done inside the thread
     Ray** imagePixelRays = calloc(p_Image->width*p_Image->height, sizeof(void*));
     for(int i = 0; i < p_Image->width;i++){
         for(int j = 0; j < p_Image->height; j++){
@@ -102,7 +97,7 @@ void MultiThread(Uint16 threadCount, Uint16 samples, Image* p_Image, Camera* p_C
 
     dataMutex = SDL_CreateMutex();
 
-    BounceData data = {.p_Hittable = p_Hittable, .p_Image = p_Image, .p_Rays = imagePixelRays, .nextSet = 0, .samples = samples};
+    MultiData data = {.p_Hittable = p_Hittable, .p_Image = p_Image, .p_Rays = imagePixelRays, .nextSet = 0, .samples = samples, .bounces = bounces};
 
     for(int i = 0; i < threadCount; i++){
         threads[i] = SDL_CreateThread(Bounce,"Thread",&data);
@@ -127,7 +122,9 @@ int main(){
 
     Uint16 x = 800, y = 800;
 
-    Uint16 samples = 16;
+    Uint16 samples = 8;
+
+    Uint8 bounces = 4;
     
     Image* image = DS_CreateImage(x,y);
 
@@ -153,7 +150,8 @@ int main(){
         DS_ListAdd(list, (Hittable *)bolas[i]);
     };
 
-    MultiThread(4, samples, image, &cam, (Hittable*)list);
+    // itd be great to get the amount of possible concurrent threads advailable here.
+    MultiThread(4, samples, bounces, image, &cam, (Hittable*)list);
 
     DS_WriteImage(image, "build/rays.png"); // <- wont say anything if there is no build dir lol.
 
