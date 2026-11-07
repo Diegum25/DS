@@ -38,7 +38,9 @@ void RayColor(Ray* ray, Hittable* list, Uint8 remaining, vec3 dest){
         HitData data = {0};
         if(list->hit(list,ray,0,FLT_MAX,&data)){
             vec3 ret = {0};
-            Ray newRay = DS_CreateRay(data.p, data.normal); // <- wrong
+            vec3 dir = {0};
+            glm_vec3_reflect(ray->destination, data.normal, dir);
+            Ray newRay = DS_CreateRay(data.p, dir); // <- correct?
             RayColor(&newRay, list, remaining - 1, ret);
             vec3 mult = {0.5f,0.5f,0.5f};
             glm_vec3_mul(ret, mult, color);

@@ -122,7 +122,7 @@ int main(){
 
     Uint16 x = 800, y = 800;
 
-    Uint16 samples = 8;
+    Uint16 samples = 128;
 
     Uint8 bounces = 4;
     
@@ -151,7 +151,8 @@ int main(){
     };
 
     // itd be great to get the amount of possible concurrent threads advailable here.
-    MultiThread(4, samples, bounces, image, &cam, (Hittable*)list);
+    // i have 8 so 8 go here but idk how many the containers will have
+    MultiThread(8, samples, bounces, image, &cam, (Hittable*)list);
 
     DS_WriteImage(image, "build/rays.png"); // <- wont say anything if there is no build dir lol.
 

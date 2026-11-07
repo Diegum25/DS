@@ -34,8 +34,5 @@ build/client-debug: $(UTILFILES) cJSON src/main.c | build
 build/rays: $(UTILFILES) src/balanceddemo.c | build
 	gcc $(DEBUGCFLAGS) $(UTILFILES) src/balanceddemo.c $(LFLAGS) -o$@
 
-build/bounce: $(UTILFILES) src/bouncedemo.c | build
-	gcc $(DEBUGCFLAGS) $(UTILFILES) src/bouncedemo.c $(LFLAGS) -o$@
-
 clean:
 	echo not implemented :P
